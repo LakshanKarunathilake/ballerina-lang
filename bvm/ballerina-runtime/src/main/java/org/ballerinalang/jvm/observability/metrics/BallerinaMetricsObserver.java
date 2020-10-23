@@ -22,7 +22,10 @@ import org.ballerinalang.jvm.observability.ObserverContext;
 
 import java.io.PrintStream;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
+
+import static org.ballerinalang.jvm.observability.tracer.TraceConstants.KEY_CUSTOM_METRIC_TAGS;
 
 /**
  * Observe the runtime and collect measurements.
@@ -91,6 +94,11 @@ public class BallerinaMetricsObserver implements BallerinaObserver {
     private void stopObservation(ObserverContext observerContext) {
         Set<Tag> mainTags = observerContext.getMainTags();
         Set<Tag> allTags = observerContext.getAllTags();
+
+        Map<String, Tag> customTags = (Map<String, Tag>) observerContext.getProperty(KEY_CUSTOM_METRIC_TAGS);
+        if(customTags != null){
+            allTags.addAll(customTags.values());
+        }
         try {
             Long startTime = (Long) observerContext.getProperty(PROPERTY_START_TIME);
             long duration = System.nanoTime() - startTime;
