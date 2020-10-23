@@ -24,6 +24,8 @@ import org.ballerinalang.config.ConfigRegistry;
 import org.ballerinalang.jvm.observability.ObserveUtils;
 import org.ballerinalang.jvm.observability.ObserverContext;
 import org.ballerinalang.jvm.observability.TracingUtils;
+import org.ballerinalang.jvm.observability.tracer.BSpan;
+import org.ballerinalang.jvm.observability.tracer.TraceConstants;
 import org.ballerinalang.jvm.observability.tracer.TracersStore;
 import org.ballerinalang.jvm.scheduling.Strand;
 
@@ -159,16 +161,22 @@ public class OpenTracerBallerinaWrapper {
         if (!enabled) {
             return false;
         }
+        Map<String, String> customTags = new HashMap<String, String>();
+        customTags.put(tagKey,tagValue);
         if (spanId == -1) {
             Optional<ObserverContext> observer = ObserveUtils.getObserverContextOfCurrentFrame(strand);
             if (observer.isPresent()) {
-                observer.get().addTag(tagKey, tagValue);
+                BSpan span = (BSpan) observer.get().getProperty(TraceConstants.KEY_SPAN);
+                span.addTags(customTags);
+                observer.get().addProperty(TraceConstants.KEY_SPAN, span);
                 return true;
             }
         }
         ObserverContext observerContext = observerContextMap.get(spanId);
         if (observerContext != null) {
-            observerContext.addTag(tagKey, tagValue);
+            BSpan span = (BSpan) observerContext.getProperty(TraceConstants.KEY_SPAN);
+            span.addTags(customTags);
+            observerContext.addProperty(TraceConstants.KEY_SPAN, span);
             return true;
         } else {
             return false;
