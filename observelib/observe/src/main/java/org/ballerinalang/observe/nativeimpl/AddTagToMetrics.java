@@ -56,8 +56,8 @@ public class AddTagToMetrics {
             return null;
         }
 
-
+        // TODO : Fix error msg
         return BErrorCreator.createError(
-                BStringUtils.fromString(("Span already finished. Can not add tag {" + tagKey + ":" + tagValue + "}")));
+                BStringUtils.fromString(("Can not add tag {" + tagKey + ":" + tagValue + "}")));
     }
 }
