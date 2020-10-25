@@ -161,13 +161,11 @@ public class OpenTracerBallerinaWrapper {
         if (!enabled) {
             return false;
         }
-        Map<String, String> customTags = new HashMap<String, String>();
-        customTags.put(tagKey,tagValue);
         if (spanId == -1) {
             Optional<ObserverContext> observer = ObserveUtils.getObserverContextOfCurrentFrame(strand);
             if (observer.isPresent()) {
                 BSpan span = (BSpan) observer.get().getProperty(TraceConstants.KEY_SPAN);
-                span.addTags(customTags);
+                span.addTag(tagKey,tagValue);
                 observer.get().addProperty(TraceConstants.KEY_SPAN, span);
                 return true;
             }
@@ -175,7 +173,7 @@ public class OpenTracerBallerinaWrapper {
         ObserverContext observerContext = observerContextMap.get(spanId);
         if (observerContext != null) {
             BSpan span = (BSpan) observerContext.getProperty(TraceConstants.KEY_SPAN);
-            span.addTags(customTags);
+            span.addTag(tagKey,tagValue);
             observerContext.addProperty(TraceConstants.KEY_SPAN, span);
             return true;
         } else {
