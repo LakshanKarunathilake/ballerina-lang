@@ -19,10 +19,10 @@ package io.ballerina.runtime.observability.metrics;
 
 import io.ballerina.runtime.observability.BallerinaObserver;
 import io.ballerina.runtime.observability.ObserverContext;
-import io.ballerina.runtime.observability.tracer.TraceConstants;
 
 import java.io.PrintStream;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +33,7 @@ import java.util.Set;
 public class BallerinaMetricsObserver implements BallerinaObserver {
 
     private static final String PROPERTY_START_TIME = "_observation_start_time_";
+    public static final String PROPERTY_CUSTOM_TAGS = "_custom_metric_tags_";
 
     private static final PrintStream consoleError = System.err;
 
@@ -93,12 +94,12 @@ public class BallerinaMetricsObserver implements BallerinaObserver {
 
     private void stopObservation(ObserverContext observerContext) {
         Set<Tag> mainTags = observerContext.getMainTags();
-        Set<Tag> allTags = observerContext.getAllTags();
-
-        Map<String, Tag> customTags = (Map<String, Tag>) observerContext.getProperty(TraceConstants.KEY_CUSTOM_METRIC_TAGS);
+        Set<Tag> allTags = new HashSet<Tag>();
+        Map<String, Tag> customTags = (Map<String, Tag>) observerContext.getProperty(BallerinaMetricsObserver.PROPERTY_CUSTOM_TAGS);
         if(customTags != null){
             allTags.addAll(customTags.values());
         }
+        allTags.addAll(observerContext.getAllTags());
         try {
             Long startTime = (Long) observerContext.getProperty(PROPERTY_START_TIME);
             long duration = System.nanoTime() - startTime;
