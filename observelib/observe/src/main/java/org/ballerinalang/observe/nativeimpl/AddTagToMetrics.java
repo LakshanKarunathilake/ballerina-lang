@@ -19,20 +19,20 @@
 
 package org.ballerinalang.observe.nativeimpl;
 
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.observability.ObserveUtils;
-import org.ballerinalang.jvm.observability.ObserverContext;
-import org.ballerinalang.jvm.observability.metrics.Tag;
-import static org.ballerinalang.jvm.observability.tracer.TraceConstants.KEY_CUSTOM_METRIC_TAGS;
-import org.ballerinalang.jvm.scheduling.Scheduler;
+
+import io.ballerina.runtime.api.ErrorCreator;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.observability.ObserveUtils;
+import io.ballerina.runtime.observability.ObserverContext;
+import io.ballerina.runtime.observability.metrics.Tag;
+import io.ballerina.runtime.observability.tracer.TraceConstants;
+import io.ballerina.runtime.scheduling.Scheduler;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.ballerinalang.jvm.observability.tracer.TraceConstants.KEY_CUSTOM_METRIC_TAGS;
 
 /**
  * This function adds tags to a span.
@@ -48,7 +48,7 @@ public class AddTagToMetrics {
         boolean tagAdded = false;
         customTags.put(tagKey.getValue(), Tag.of(tagKey.getValue(), tagValue.getValue()));
         if (observer.isPresent()) {
-            observer.get().addProperty(KEY_CUSTOM_METRIC_TAGS, customTags);
+            observer.get().addProperty(TraceConstants.KEY_CUSTOM_METRIC_TAGS, customTags);
             tagAdded =  true;
         }
 
@@ -56,8 +56,7 @@ public class AddTagToMetrics {
             return null;
         }
 
-        // TODO : Fix error msg
-        return BErrorCreator.createError(
-                BStringUtils.fromString(("Can not add tag {" + tagKey + ":" + tagValue + "}")));
+        return ErrorCreator.createError(
+                StringUtils.fromString(("Can not add tag {" + tagKey + ":" + tagValue + "}")));
     }
 }

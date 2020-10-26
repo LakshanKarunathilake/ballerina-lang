@@ -19,13 +19,13 @@ package io.ballerina.runtime.observability.metrics;
 
 import io.ballerina.runtime.observability.BallerinaObserver;
 import io.ballerina.runtime.observability.ObserverContext;
+import io.ballerina.runtime.observability.tracer.TraceConstants;
 
 import java.io.PrintStream;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 
-import static org.ballerinalang.jvm.observability.tracer.TraceConstants.KEY_CUSTOM_METRIC_TAGS;
 
 /**
  * Observe the runtime and collect measurements.
@@ -95,7 +95,7 @@ public class BallerinaMetricsObserver implements BallerinaObserver {
         Set<Tag> mainTags = observerContext.getMainTags();
         Set<Tag> allTags = observerContext.getAllTags();
 
-        Map<String, Tag> customTags = (Map<String, Tag>) observerContext.getProperty(KEY_CUSTOM_METRIC_TAGS);
+        Map<String, Tag> customTags = (Map<String, Tag>) observerContext.getProperty(TraceConstants.KEY_CUSTOM_METRIC_TAGS);
         if(customTags != null){
             allTags.addAll(customTags.values());
         }
