@@ -25,6 +25,7 @@ import io.ballerina.runtime.api.StringUtils;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.observability.ObserveUtils;
 import io.ballerina.runtime.observability.ObserverContext;
+import io.ballerina.runtime.observability.metrics.BallerinaMetricsObserver;
 import io.ballerina.runtime.observability.metrics.Tag;
 import io.ballerina.runtime.observability.tracer.TraceConstants;
 import io.ballerina.runtime.scheduling.Scheduler;
@@ -38,24 +39,18 @@ import java.util.Optional;
  * This function adds tags to a span.
  */
 public class AddTagToMetrics {
-    private static final OpenTracerBallerinaWrapper otWrapperInstance = OpenTracerBallerinaWrapper.getInstance();
-
     public static Object addTagToMetrics(BString tagKey, BString tagValue) {
         Optional<ObserverContext> observer = ObserveUtils.getObserverContextOfCurrentFrame(Scheduler.getStrand());
-
-
-        Map<String, Tag> customTags = new HashMap<String, Tag>();
-        boolean tagAdded = false;
-        customTags.put(tagKey.getValue(), Tag.of(tagKey.getValue(), tagValue.getValue()));
+        ObserverContext observerContext;
         if (observer.isPresent()) {
-            observer.get().addProperty(TraceConstants.KEY_CUSTOM_METRIC_TAGS, customTags);
-            tagAdded =  true;
-        }
-
-        if (tagAdded) {
+            observerContext = observer.get();
+            Map<String, Tag> customTags = observerContext.getProperty(BallerinaMetricsObserver.PROPERTY_CUSTOM_TAGS) != null ?
+                    (Map<String, Tag>) observerContext.getProperty(BallerinaMetricsObserver.PROPERTY_CUSTOM_TAGS) :
+                    new HashMap<String, Tag>();
+            customTags.put(tagKey.getValue(), Tag.of(tagKey.getValue(), tagValue.getValue()));
+            observerContext.addProperty(BallerinaMetricsObserver.PROPERTY_CUSTOM_TAGS,customTags);
             return null;
         }
-
         return ErrorCreator.createError(
                 StringUtils.fromString(("Can not add tag {" + tagKey + ":" + tagValue + "}")));
     }
