@@ -33,7 +33,6 @@ public class TraceConstants {
     static final String DEFAULT_SERVICE_NAME = "BallerinaService";
     static final String DEFAULT_OPERATION_NAME = "BallerinaOperation";
     public static final String KEY_SPAN = "_span_";
-    public static final String KEY_CUSTOM_METRIC_TAGS = "custom_metrics";
 
     public static final String TAG_KEY_SPAN_KIND = "span.kind";
 
